@@ -44,3 +44,30 @@ def list_2_markers_array(path, ccxyth):
         
     return np.array(markerarray)
 
+def viterbi(obs,Modelo1,PI):
+    A, B= Modelo1.A , Modelo1.B
+    
+    delta=np.zeros((len(obs)+1,len(Modelo1.A)))
+    phi=np.zeros((len(obs)+1,len(A)))+666
+    path =np.zeros(len(obs)+1)
+    T=len(obs)
+    Modelo1.PI = PI
+    delta[0,:]= Modelo1.PI * Modelo1.B[:,obs[0]]
+    phi[0,:]=666
+    for t in range(len(obs)):
+        for j in range(delta.shape[1]):
+
+            delta [t+1,j]=np.max(delta[t] * A[:,j]) * B[j,obs[t]]
+            phi[t+1,j]= np.argmax(delta[t] * A[:,j])
+    path[T]=int(np.argmax(delta[T,:]))
+    for i in np.arange(T-1,0,-1):
+        #print (i,phi[i+1,int(path[i+1])])
+        path[i]=phi[i+1,int(path[i+1])]
+    return(path)
+
+class HMM (object):
+             def __init__(self,A,B,PI):
+                 self.A=A
+                 self.B=B
+                 self.PI=PI   
+
