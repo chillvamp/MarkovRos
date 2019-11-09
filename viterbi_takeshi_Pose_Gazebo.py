@@ -19,10 +19,12 @@ from tf.transformations import *
 from tf.msg import tfMessage
 from tf.transformations import euler_from_quaternion
 from utils import  viterbi
-global cont
+from utils import forw_alg
+from utils import backw_alg
+global o_k
 global buf_vit
-cont=[]
-buf_vit=120
+o_k=[]
+buf_vit=100
 
 
 
@@ -36,8 +38,7 @@ global Modelo1
 A, B, PI= np.load('A.npy') , np.load('B.npy') , np.load('PI.npy')
 
 Modelo1= HMM(A,B,PI)
-A2, B2, PI2= np.load('A2.npy') , np.load('B2.npy') , np.load('PI2.npy')
-Modelo2= HMM(A2,B2,PI2)
+
 
 def callback(laser,pose):
     
@@ -70,19 +71,22 @@ def callback(laser,pose):
         #pitch = euler[1]
         #yaw = euler[2]
         symbol= np.power(lec.T-centroides,2).sum(axis=1,keepdims=True).argmax()
-        if len(cont) >=buf_vit:
-            cont.pop(0)
-        cont.append(symbol)
+        if len(o_k) >=buf_vit:
+            o_k.pop(0)
+        o_k.append(symbol)
         xyth= np.asarray((pose.pose.position.x,pose.pose.position.y,euler[2]))
        
         xythcuant=np.argmin(np.linalg.norm(xyth-ccxyth,axis=1))
       
         
-        if (len(cont)== buf_vit):
-            #print (cont)
-            vit_est= viterbi(cont,Modelo1,Modelo1.PI)
-            print ('#############################',vit_est)
-            #vit_est= viterbi(cont,Modelo2,Modelo2.PI)
+        if (len(o_k)== buf_vit):
+            #print (o_k)
+            vit_est= viterbi(o_k,Modelo1,Modelo1.PI)
+            alpha= forw_alg(o_k,Modelo1)
+            print ('Most likely state seq given O',vit_est)
+            print ('P State given O, M',alpha[:,-1])
+            
+            #vit_est= viterbi(o_k,Modelo2,Modelo2.PI)
             #print ('#############################',vit_est)
         print('lec vk'+str(symbol)+' Pose ('  +str(xyth[0])+","+ str(xyth[1])  +","+str(euler[2])  +') , ccxyth[ '+str(xythcuant)+']='+str(ccxyth[xythcuant]) + '\n')
         

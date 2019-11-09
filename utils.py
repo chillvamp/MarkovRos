@@ -70,4 +70,36 @@ class HMM (object):
                  self.A=A
                  self.B=B
                  self.PI=PI   
+def forw_alg(o_k,Modelo):
+    #MATRIX NOTATION
+    PI=Modelo.PI
+    K= len(o_k)   #Secuencia Observaciones
+    N= len(Modelo.A)  #número de estados
+    alpha=np.zeros((N,K))
+    c_k= np.zeros(K)
+    alpha[:,0]= PI
+    c_k[0]=1
+    for k in range(1,K):
+        alpha_k= alpha[:,k-1]
+        a= Modelo.A[:,:]
+        b= Modelo.B[:,o_k[k]]
+        alpha[:,k]=(b*np.dot(alpha_k,a))* c_k[k-1]
+        c_k[k]=1/alpha[:,k].sum()
+    return alpha #,c_k
+def  backw_alg(o_k,Modelo):
+    #MATRIX NOTATION
 
+    PI=Modelo.PI
+    K= len(o_k)   #Secuencia Observaciones
+    N= len(Modelo.A)  #número de estados
+    beta=np.zeros((N,K))
+    beta[:,-1]=1
+    for t in range(K-2,-1,-1):
+        beta_t1=beta[:,t+1]
+        beta_t1
+        a= Modelo.A[:,:]
+        b= Modelo.B[:,o_k[t]]
+        beta[:,t]= b*np.dot(a,beta_t1)
+    return beta
+    
+    
