@@ -324,7 +324,7 @@ def readSensor(data):
             print('Vang-')
             speed.linear.x=vel
             speed.angular.z=-2
-            if Ftotth > 1.57:
+            if Ftotth > .7:
                 print('ang--')
                 speed.linear.x=0
                 speed.angular.z=-0.5
@@ -337,7 +337,7 @@ def readSensor(data):
             print('Vang+')
             speed.linear.x=vel
             speed.angular.z=2
-            if Ftotth < -1.57:
+            if Ftotth < -.7:
             
                 print('ang++')
                 speed.linear.x=0
